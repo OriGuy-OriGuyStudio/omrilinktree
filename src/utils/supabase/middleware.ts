@@ -35,28 +35,39 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/admin/login')
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
-  const isBaseRoute = request.nextUrl.pathname.startsWith('/')
+  const { pathname } = request.nextUrl
+  const isAuthRoute = pathname.startsWith('/admin/login')
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isRootPath = pathname === '/'
 
-  if (isAdminRoute && !isAuthRoute && !user) {
-    // no user, potentially respond by redirecting the user to the login page
+  // If user is not logged in and trying to access admin or root, redirect to login
+  if (!user && !isAuthRoute && (isAdminRoute || isRootPath)) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
-    return NextResponse.redirect(url)
-  }
-  if (isBaseRoute && !isAuthRoute && !user) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/admin/login'
-    return NextResponse.redirect(url)
+    
+    // Create the redirect response
+    const response = NextResponse.redirect(url)
+    
+    // IMPORTANT: Propagate the cookies from the supabaseResponse to the redirect response
+    // This ensures we don't lose the refreshed session if getUser() triggered a refresh
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value, cookie)
+    })
+    
+    return response
   }
 
-  if (isAuthRoute && user) {
-    // user is logged in, redirect to dashboard
+  // If user is logged in and trying to access login, redirect to dashboard
+  if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin/dashboard'
-    return NextResponse.redirect(url)
+    
+    const response = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value, cookie)
+    })
+    
+    return response
   }
 
   return supabaseResponse
