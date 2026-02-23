@@ -34,10 +34,10 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
 
   return (
     <div 
-      className={`min-h-screen w-full flex flex-col items-center py-16 px-4`}
+      className={`min-h-screen w-full flex flex-col items-center pt-16 pb-4 px-4`}
       style={bgStyle}
     >
-      <div className="w-full max-w-[600px] flex flex-col items-center">
+      <div className="w-full max-w-[600px] flex flex-col items-center flex-1">
         
         {/* Profile Header */}
         <div 
@@ -61,7 +61,7 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
           )}
         </div>
 
-        <div className="w-full space-y-4 z-10 flex-1">
+        <div className="w-full space-y-4 z-10">
           {links?.map((link) => {
             const getIcon = (name: string) => {
               if (!name) return LucideIcons.Link;
@@ -102,9 +102,9 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
         </div>
 
         {/* Branding Footer */}
-        <div className="mt-16 text-sm text-center pb-4 z-10 font-medium tracking-widest uppercase opacity-50 transition-opacity hover:opacity-100" style={{ color: linktree.text_color || '#ffffff' }}>
+        <div className="mt-auto pt-16 text-sm text-center z-10 font-medium tracking-widest uppercase opacity-50 transition-opacity hover:opacity-100" style={{ color: linktree.text_color || '#ffffff' }}>
           <a href="https://insights.origuystudio.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-            Powered by Ori Guy Studio x Omri
+            עוצב ופותח על ידי סטודיו אורי גיא
           </a>
         </div>
 
