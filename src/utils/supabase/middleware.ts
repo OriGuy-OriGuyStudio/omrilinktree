@@ -38,7 +38,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthRoute = pathname.startsWith('/admin/login')
   const isAdminRoute = pathname.startsWith('/admin')
-  const isRootPath = pathname === '/'
+  const isRootPath = pathname === '/' || pathname === ''
 
   // If user is not logged in and trying to access admin or root, redirect to login
   if (!user && !isAuthRoute && (isAdminRoute || isRootPath)) {

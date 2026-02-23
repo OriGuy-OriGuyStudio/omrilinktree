@@ -32,7 +32,7 @@ export default async function AdminDashboard() {
               </Link>
             </Button>
             <form action="/auth/signout" method="post">
-              <Button variant="outline" className="border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-900">
+              <Button type="submit" variant="outline" className="border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-900">
                 <LogOut className="w-4 h-4 mr-2" />
                 התנתק
               </Button>

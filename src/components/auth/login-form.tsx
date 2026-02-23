@@ -78,7 +78,7 @@ export function LoginForm() {
             />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pt-2 pb-6">
           <Button
             type="submit"
             className="w-full bg-white text-black hover:bg-neutral-200"
