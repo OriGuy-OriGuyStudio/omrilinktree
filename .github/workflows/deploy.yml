@@ -17,19 +17,17 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
           script: |
-            # 1. כניסה לתיקייה (נתיב מקוצר למשתמש weuysdhadp)
-            cd ~/public_html
+            # כניסה לנתיב המלא של האפליקציה החדשה דרך משתמש ה-Master
+            cd ~/applications/weuysdhadp/public_html
             
-            # 2. טעינת הסביבה של Node (כדי ש-npm ו-pm2 יעבדו ב-SSH)
+            # טעינת Node
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             
-            # 3. עדכון הקוד מענף master
+            # עדכון הקוד ובנייה
             git pull origin master
-            
-            # 4. התקנת חבילות ובנייה
             npm install
             npm run build
             
-            # 5. ריסטארט לאפליקציה ב-PM2
+            # ריסטארט (חשוב: וודא שזה השם ב-pm2)
             pm2 restart nextjs-app
