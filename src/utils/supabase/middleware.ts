@@ -37,8 +37,15 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/admin/login')
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  const isBaseRoute = request.nextUrl.pathname.startsWith('/')
 
   if (isAdminRoute && !isAuthRoute && !user) {
+    // no user, potentially respond by redirecting the user to the login page
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/login'
+    return NextResponse.redirect(url)
+  }
+  if (isBaseRoute && !isAuthRoute && !user) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
