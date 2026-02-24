@@ -102,9 +102,15 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
         </div>
 
         {/* Branding Footer */}
-        <div className="mt-auto pt-16 text-sm text-center z-10 font-medium tracking-widest uppercase opacity-50 transition-opacity hover:opacity-100" style={{ color: linktree.text_color || '#ffffff' }}>
-          <a href="https://insights.origuystudio.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-            עוצב ופותח על ידי סטודיו אורי גיא
+        <div className="mt-auto w-full pb-4 z-10 flex justify-center">
+          <a 
+            href="https://insights.origuystudio.com" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="px-6 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-sm md:text-sm font-medium tracking-wide transition-all hover:bg-black/50 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center gap-2"
+            style={{ color: linktree.text_color || '#ffffff' }}
+          >
+            <span>עוצב ופותח על ידי סטודיו אורי גיא</span>
           </a>
         </div>
 

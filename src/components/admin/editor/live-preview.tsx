@@ -99,9 +99,15 @@ export default function LivePreview({ data }: LivePreviewProps) {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-xs text-center pb-4 z-10 font-medium tracking-wide opacity-50 transition-opacity hover:opacity-100" style={{ color: data.text_color || '#ffffff' }}>
-          <a href="https://insights.origuystudio.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-            Powered by Ori Guy Studio x Omri
+        <div className="mt-8 flex justify-center pb-4 z-10">
+          <a 
+            href="https://insights.origuystudio.com" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="px-4 py-2 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-xs font-medium tracking-wide transition-all hover:bg-black/40 flex items-center gap-2 origin-center"
+            style={{ color: data.text_color || '#ffffff' }}
+          >
+            <span>עוצב ופותח על ידי סטודיו אורי גיא</span>
           </a>
         </div>
 

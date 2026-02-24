@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,25 @@ import LivePreview from './live-preview'
 import { uploadImage } from '@/utils/supabase/storage'
 import { ModeToggle } from '@/components/mode-toggle'
 import confetti from 'canvas-confetti'
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  TouchSensor,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 export interface Link {
   id: string
@@ -52,6 +71,91 @@ function parseGradient(bgValue: string) {
   return { angle: 90, c1: '#111111', c2: '#333333' }
 }
 
+interface SortableLinkItemProps {
+  link: Link
+  updateLink: (id: string, field: keyof Link, value: any) => void
+  removeLink: (id: string) => void
+}
+
+function SortableLinkItem({ link, updateLink, removeLink }: SortableLinkItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: link.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`bg-card border rounded-lg p-4 flex gap-3 group shadow-sm transition-shadow ${isDragging ? 'shadow-xl' : ''}`}
+    >
+      <div 
+        {...attributes} 
+        {...listeners} 
+        className="cursor-grab pt-2 text-muted-foreground hover:text-foreground active:cursor-grabbing touch-none"
+      >
+        <GripVertical className="w-5 h-5" />
+      </div>
+      <div className="flex-1 space-y-3">
+        <div className="flex gap-2">
+          <Input 
+            value={link.title} 
+            onChange={(e) => updateLink(link.id, 'title', e.target.value)} 
+            placeholder="כותרת הקישור" 
+            className="bg-neutral-950 border-neutral-800 w-2/3"
+          />
+          <Input 
+            value={link.icon} 
+            onChange={(e) => updateLink(link.id, 'icon', e.target.value)} 
+            placeholder="שם אייקון (למשל Link, Youtube)" 
+            className="bg-neutral-950 border-neutral-800 w-1/3"
+            dir="ltr"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Input 
+            value={link.url} 
+            onChange={(e) => updateLink(link.id, 'url', e.target.value)} 
+            placeholder="כתובת URL" 
+            dir="ltr"
+            className="bg-neutral-950 border-neutral-800 text-left"
+          />
+        </div>
+        
+        {/* Link Colors */}
+        <div className="flex gap-4 pt-4 border-t mt-2">
+          <div className="flex items-center gap-2 flex-1">
+            <Label className="text-xs text-muted-foreground shrink-0">צבע רקע</Label>
+            <div className="flex w-full gap-2">
+              <Input type="color" value={link.bg_color.length === 7 ? link.bg_color : '#ffffff'} onChange={(e) => updateLink(link.id, 'bg_color', e.target.value)} className="w-8 h-8 p-0 border-0 bg-transparent rounded-md cursor-pointer shrink-0" />
+              <Input value={link.bg_color} onChange={(e) => updateLink(link.id, 'bg_color', e.target.value)} className="h-8 text-xs font-mono" dir="ltr" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Label className="text-xs text-muted-foreground">צבע טקסט</Label>
+            <Input type="color" value={link.text_color} onChange={(e) => updateLink(link.id, 'text_color', e.target.value)} className="w-8 h-8 p-0 border-0 bg-transparent rounded-md cursor-pointer" />
+          </div>
+        </div>
+
+      </div>
+      <Button variant="ghost" size="icon" onClick={() => removeLink(link.id)} className="text-destructive hover:bg-destructive/10 shrink-0">
+        <Trash2 className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+}
+
 export default function LinktreeEditor({ isNew, linktreeId, initialData }: LinktreeEditorProps) {
   const router = useRouter()
   const supabase = createClient()
@@ -75,6 +179,55 @@ export default function LinktreeEditor({ isNew, linktreeId, initialData }: Linkt
       text_color: l.text_color || '#ffffff'
     })) || [],
   })
+
+  // DND setup
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 300,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setData((prev) => {
+        const oldIndex = prev.links.findIndex((l) => l.id === active.id);
+        const newIndex = prev.links.findIndex((l) => l.id === over?.id);
+
+        return {
+          ...prev,
+          links: arrayMove(prev.links, oldIndex, newIndex),
+        };
+      });
+    }
+  }
+
+  // Use callback for passing to memoized components if needed
+  const updateLink = useCallback((id: string, field: keyof Link, value: any) => {
+    setData(prev => ({
+      ...prev,
+      links: prev.links.map(link => link.id === id ? { ...link, [field]: value } : link)
+    }))
+  }, [])
+
+  const removeLink = useCallback((id: string) => {
+    setData(prev => ({
+      ...prev,
+      links: prev.links.filter(link => link.id !== id)
+    }))
+  }, [])
 
   // For gradient UI
   const grad = parseGradient(data.bg_value)
@@ -136,20 +289,6 @@ export default function LinktreeEditor({ isNew, linktreeId, initialData }: Linkt
       text_color: txtColor
     }
     setData(prev => ({ ...prev, links: [...prev.links, newLink] }))
-  }
-
-  const updateLink = (id: string, field: keyof Link, value: any) => {
-    setData(prev => ({
-      ...prev,
-      links: prev.links.map(link => link.id === id ? { ...link, [field]: value } : link)
-    }))
-  }
-
-  const removeLink = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      links: prev.links.filter(link => link.id !== id)
-    }))
   }
 
   const handleSave = async () => {
@@ -356,59 +495,25 @@ export default function LinktreeEditor({ isNew, linktreeId, initialData }: Linkt
                 </Button>
 
                 <div className="space-y-4 mt-6">
-                  {data.links.map((link) => (
-                    <div key={link.id} className="bg-card border rounded-lg p-4 flex gap-3 group shadow-sm">
-                      <div className="cursor-grab pt-2 text-muted-foreground hover:text-foreground">
-                        <GripVertical className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <div className="flex gap-2">
-                          <Input 
-                            value={link.title} 
-                            onChange={(e) => updateLink(link.id, 'title', e.target.value)} 
-                            placeholder="כותרת הקישור" 
-                            className="bg-neutral-950 border-neutral-800 w-2/3"
-                          />
-                          <Input 
-                            value={link.icon} 
-                            onChange={(e) => updateLink(link.id, 'icon', e.target.value)} 
-                            placeholder="שם אייקון (למשל Link, Youtube)" 
-                            className="bg-neutral-950 border-neutral-800 w-1/3"
-                            dir="ltr"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Input 
-                            value={link.url} 
-                            onChange={(e) => updateLink(link.id, 'url', e.target.value)} 
-                            placeholder="כתובת URL" 
-                            dir="ltr"
-                            className="bg-neutral-950 border-neutral-800 text-left"
-                          />
-                        </div>
-                        
-                        {/* Link Colors */}
-                        <div className="flex gap-4 pt-4 border-t mt-2">
-                          <div className="flex items-center gap-2 flex-1">
-                            <Label className="text-xs text-muted-foreground shrink-0">צבע רקע</Label>
-                            {/* If it's a gradient, show text input, otherwise show color picker. We will use two inputs for best UX */}
-                            <div className="flex w-full gap-2">
-                              <Input type="color" value={link.bg_color.length === 7 ? link.bg_color : '#ffffff'} onChange={(e) => updateLink(link.id, 'bg_color', e.target.value)} className="w-8 h-8 p-0 border-0 bg-transparent rounded-md cursor-pointer shrink-0" />
-                              <Input value={link.bg_color} onChange={(e) => updateLink(link.id, 'bg_color', e.target.value)} className="h-8 text-xs font-mono" dir="ltr" />
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <Label className="text-xs text-muted-foreground">צבע טקסט</Label>
-                            <Input type="color" value={link.text_color} onChange={(e) => updateLink(link.id, 'text_color', e.target.value)} className="w-8 h-8 p-0 border-0 bg-transparent rounded-md cursor-pointer" />
-                          </div>
-                        </div>
-
-                      </div>
-                      <Button variant="ghost" size="icon" onClick={() => removeLink(link.id)} className="text-destructive hover:bg-destructive/10 shrink-0">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={data.links.map(l => l.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {data.links.map((link) => (
+                        <SortableLinkItem 
+                          key={link.id} 
+                          link={link} 
+                          updateLink={updateLink} 
+                          removeLink={removeLink} 
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                   {data.links.length === 0 && (
                     <p className="text-center text-neutral-500 text-sm">אין קישורים. הוסף קישור או השתמש בתבניות למעלה.</p>
                   )}
