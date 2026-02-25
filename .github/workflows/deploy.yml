@@ -16,18 +16,15 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          script: |
-            # כניסה לנתיב המלא של האפליקציה החדשה דרך משתמש ה-Master
+                    script: |
             cd ~/applications/weuysdhadp/public_html
             
-            # טעינת Node
+    
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            
-            # עדכון הקוד ובנייה
             git pull origin master
             npm install
+            rm -rf .next
             npm run build
-            
-            # ריסטארט (חשוב: וודא שזה השם ב-pm2)
-            pm2 restart nextjs-app
+            pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start -- -p 3002
+            curl -X PURGE http://127.0.0.1:3002
