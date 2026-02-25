@@ -35,7 +35,3 @@ jobs:
             
             # 4. ריסטארט ל-PM2 (שימוש ב-reload לביצועים טובים יותר)
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start -- -p 3002
-            
-            # 5. ניקוי Varnish (אם מותקן כלי ה-CLI של Cloudways)
-            # אם הפקודה הזו נכשלת, פשוט תכבה את ה-Varnish בפאנל
-            curl -X PURGE http://127.0.0.1:3002
