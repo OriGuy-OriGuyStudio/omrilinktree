@@ -16,15 +16,26 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-                    script: |
+          script: |
             cd ~/applications/weuysdhadp/public_html
             
-    
+            # טעינת Node ו-NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # 1. משיכת קוד חדש
             git pull origin master
+            
+            # 2. התקנה נקייה
             npm install
+            
+            # 3. מחיקת ה-Build הישן ובנייה מחדש (מבטיח שהשינויים ייכנסו)
             rm -rf .next
             npm run build
+            
+            # 4. ריסטארט ל-PM2 (שימוש ב-reload לביצועים טובים יותר)
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start -- -p 3002
+            
+            # 5. ניקוי Varnish (אם מותקן כלי ה-CLI של Cloudways)
+            # אם הפקודה הזו נכשלת, פשוט תכבה את ה-Varnish בפאנל
             curl -X PURGE http://127.0.0.1:3002
