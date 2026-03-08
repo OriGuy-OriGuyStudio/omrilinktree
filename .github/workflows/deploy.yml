@@ -17,17 +17,25 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
           script: |
-            # כניסה לנתיב המלא של האפליקציה החדשה דרך משתמש ה-Master
             cd ~/applications/weuysdhadp/public_html
             
-            # טעינת Node
+            # 1. פתרון בעיית הבעלות (השורה שחובה להוסיף)
+            git config --global --add safe.directory /home/1587884.cloudwaysapps.com/weuysdhadp/public_html
+            
+            # טעינת Node ו-NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             
-            # עדכון הקוד ובנייה
+            # 2. עצירה אם משהו נכשל (כדי שלא נראה "וי ירוק" כשזה נכשל)
+            set -e
+            
+            # 3. משיכת קוד חדש (עכשיו זה יעבוד!)
             git pull origin master
+            
+            # 4. התקנה ובנייה מחדש
             npm install
+            rm -rf .next
             npm run build
             
-            # ריסטארט (חשוב: וודא שזה השם ב-pm2)
-            pm2 restart nextjs-app
+            # 5. ריסטארט ל-PM2
+            pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start -- -p 3002
