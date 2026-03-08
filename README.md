@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OmriLinkTree 🚀 
+### הפוך את הנוכחות הדיגיטלית שלך לסיפור הצלחה
 
-## Getting Started
+בעולם של רשתות חברתיות רבות, **OmriLinkTree** הוא הפתרון המושלם לרכז את כל הפעילות שלך במקום אחד מעוצב, מקצועי ומרשים. בין אם אתם יוצרי תוכן, בעלי עסקים או פרילנסרים - העמוד שלכם הוא כרטיס הביקור הדיגיטלי החדש שלכם.
 
-First, run the development server:
+## למה לבחור ב-OmriLinkTree?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+✅ **מיתוג אישי ללא פשרות**: עמוד נחיתה אישי שמשקף את הזהות שלך בצורה יוקרתית.  
+✅ **חוויית משתמש (UX) מנצחת**: ממשק מהיר, נקי ומזמין שמעודד את המבקרים להקליק.  
+✅ **שליטה מלאה בקליק**: הוסיפו, ערכו ושנו את סדר הקישורים בשניות עם ממשק גרירה (Drag & Drop) אינטואיטיבי.  
+✅ **ביצועים שיא**: טכנולוגיה מתקדמת שמבטיחה שהעמוד שלכם ייטען ברגע, בכל מכשיר.  
+✅ **ניהול חכם**: לוח בקרה להחלפת קישורים מהירה בזמן אמת.  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ה-Stack הטכנולוגי (המנוע שמאחורי הקסם)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+השקענו בטכנולוגיה מהשורה הראשונה כדי להבטיח את החוויה הטובה ביותר:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[Next.js](https://nextjs.org/)**: למהירות טעינה פנומנלית וביצועי SEO מעולים.
+- **[Supabase](https://supabase.com/)**: ניהול נתונים מאובטח ויציב ברמת Enterprise.
+- **[Tailwind CSS 4](https://tailwindcss.com/)**: סטיילינג מודרני, גמיש וחד שמבטיח מראה פרימיום.
+- **[Radix UI](https://www.radix-ui.com/) & [shadcn/ui](https://ui.shadcn.com/)**: רכיבי ממשק מונגשים, מעוצבים ונוחים.
+- **[dnd-kit](https://dndkit.com/)**: מנגנון גרירה וסידור חלק במיוחד, מותאם לנייד.
 
-## Learn More
+## התקנה והרצה (למפתחים)
 
-To learn more about Next.js, take a look at the following resources:
+1. שכפלו את המאגר (Clone).
+2. התקינו את התלויות:
+   ```bash
+   npm install
+   ```
+3. הגדירו משתני סביבה בקובץ `.env.local` עבור Supabase.
+4. הריצו את שרת הפיתוח:
+   ```bash
+   npm run dev
+   ```
+5. פתחו את [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### מיוצר על ידי המומחים
+הפרויקט נבנה בסטנדרטים הגבוהים ביותר על ידי **[סטודיו אורי גיא](https://www.origuy.com/)**. אנחנו מתמחים ביצירת פתרונות דיגיטליים שמשלבים עיצוב מרהיב עם טכנולוגיה חסרת פשרות.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**צריכים פתרון מותאם אישית? [דברו איתנו](https://www.origuy.com/contact)** ❤️
