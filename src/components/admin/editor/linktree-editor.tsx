@@ -53,7 +53,6 @@ export interface Link {
   order: number;
   bg_color: string;
   text_color: string;
-  border_radius: string;
 }
 
 export interface LinktreeData {
@@ -65,6 +64,7 @@ export interface LinktreeData {
   bg_type: "solid" | "gradient" | "image";
   bg_value: string;
   text_color: string;
+  border_radius: string;
   links: Link[];
 }
 
@@ -190,30 +190,6 @@ function SortableLinkItem({
             />
           </div>
         </div>
-
-        {/* Border Radius Control */}
-        <div className="flex items-center gap-3 pt-2">
-          <Label className="text-xs text-muted-foreground shrink-0">
-            עיגול פינות
-          </Label>
-          <input
-            type="range"
-            min="0"
-            max="40"
-            step="1"
-            value={parseInt(link.border_radius || "12")}
-            onChange={(e) =>
-              updateLink(link.id, "border_radius", `${e.target.value}px`)
-            }
-            className="flex-1 h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-primary"
-          />
-          <span
-            className="text-[10px] font-mono text-muted-foreground w-8 text-left"
-            dir="ltr"
-          >
-            {link.border_radius || "12px"}
-          </span>
-        </div>
       </div>
       <Button
         variant="ghost"
@@ -250,12 +226,12 @@ export default function LinktreeEditor({
         ? "linear-gradient(90deg, #111111, #333333)" // Migrate old tailwind class to standard css
         : initialData?.bg_value || "#0e0e0e",
     text_color: initialData?.text_color || "#ffffff",
+    border_radius: initialData?.border_radius || "12px",
     links:
       initialData?.links?.map((l: any) => ({
         ...l,
         bg_color: l.bg_color || "rgba(255,255,255,0.1)",
         text_color: l.text_color || "#ffffff",
-        border_radius: l.border_radius || "12px",
       })) || [],
   });
 
@@ -367,7 +343,6 @@ export default function LinktreeEditor({
       order: data.links.length,
       bg_color: "rgba(255,255,255,0.1)",
       text_color: "#ffffff",
-      border_radius: "12px",
     };
     setData((prev) => ({ ...prev, links: [...prev.links, newLink] }));
   };
@@ -387,7 +362,6 @@ export default function LinktreeEditor({
       order: data.links.length,
       bg_color: bgColor,
       text_color: txtColor,
-      border_radius: "12px",
     };
     setData((prev) => ({ ...prev, links: [...prev.links, newLink] }));
   };
@@ -413,6 +387,7 @@ export default function LinktreeEditor({
             ? `linear-gradient(${gradAngle}deg, ${gradC1}, ${gradC2})`
             : data.bg_value,
         text_color: data.text_color,
+        border_radius: data.border_radius,
       };
 
       if (isNew) {
@@ -449,7 +424,6 @@ export default function LinktreeEditor({
           order: index,
           bg_color: link.bg_color,
           text_color: link.text_color,
-          border_radius: link.border_radius || "12px",
         }));
 
         const { error: insertError } = await supabase
@@ -799,6 +773,29 @@ export default function LinktreeEditor({
                         dir="ltr"
                       >
                         {data.text_color || "#ffffff"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pb-4 border-b border-neutral-800">
+                    <Label>עיגול פינות לכל הקישורים</Label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={parseInt(data.border_radius || "12")}
+                        onChange={(e) =>
+                          handleChange("border_radius", `${e.target.value}px`)
+                        }
+                        className="flex-1 h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-white"
+                      />
+                      <span
+                        className="text-sm font-mono text-neutral-400 w-12 text-left"
+                        dir="ltr"
+                      >
+                        {data.border_radius || "12px"}
                       </span>
                     </div>
                   </div>

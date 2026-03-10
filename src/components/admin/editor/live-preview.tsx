@@ -98,7 +98,7 @@ export default function LivePreview({ data }: LivePreviewProps) {
                 style={{
                   background: link.bg_color || "rgba(255,255,255,0.1)",
                   color: link.text_color || "#ffffff",
-                  borderRadius: link.border_radius || "12px",
+                  borderRadius: data.border_radius || "12px",
                 }}
               >
                 <div className="absolute right-4">

@@ -114,7 +114,7 @@ export default async function PublicLinktreePage({
                 style={{
                   background: link.bg_color || "rgba(255,255,255,0.1)",
                   color: link.text_color || "#ffffff",
-                  borderRadius: link.border_radius || "12px",
+                  borderRadius: linktree.border_radius || "12px",
                 }}
               >
                 <div className="absolute right-4">
