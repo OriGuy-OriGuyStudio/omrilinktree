@@ -1,59 +1,82 @@
-import { createClient } from '@/utils/supabase/server'
-import { notFound } from 'next/navigation'
-import * as LucideIcons from 'lucide-react'
-import Image from 'next/image'
+import { createClient } from "@/utils/supabase/server";
+import { notFound } from "next/navigation";
+import * as LucideIcons from "lucide-react";
+import Image from "next/image";
 
-export const revalidate = 60 // Revalidate every 60 seconds
+export const revalidate = 60; // Revalidate every 60 seconds
 
-export default async function PublicLinktreePage({ params }: { params: { slug: string } }) {
-  const supabase = await createClient()
+export default async function PublicLinktreePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const supabase = await createClient();
 
-  const resolvedParams = await params
-  const { slug } = resolvedParams
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
 
   const { data: linktree, error: linktreeError } = await supabase
-    .from('linktrees')
-    .select('*')
-    .eq('slug', slug)
-    .single()
+    .from("linktrees")
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
   if (linktreeError || !linktree) {
-    notFound()
+    notFound();
   }
 
   const { data: links } = await supabase
-    .from('links')
-    .select('*')
-    .eq('linktree_id', linktree.id)
-    .order('order', { ascending: true })
+    .from("links")
+    .select("*")
+    .eq("linktree_id", linktree.id)
+    .order("order", { ascending: true });
 
   // Styling logic
-  const bgStyle = linktree.bg_type === 'solid' ? { backgroundColor: linktree.bg_value || '#0a0a0a' } : 
-                  linktree.bg_type === 'image' ? { backgroundImage: `url(${linktree.bg_value})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', backgroundPosition: 'center' } : 
-                  linktree.bg_type === 'gradient' ? { background: linktree.bg_value } : {}
+  const bgStyle =
+    linktree.bg_type === "solid"
+      ? { backgroundColor: linktree.bg_value || "#0a0a0a" }
+      : linktree.bg_type === "image"
+        ? {
+            backgroundImage: `url(${linktree.bg_value})`,
+            backgroundSize: "cover",
+            backgroundAttachment: "fixed",
+            backgroundPosition: "center",
+          }
+        : linktree.bg_type === "gradient"
+          ? { background: linktree.bg_value }
+          : {};
 
   return (
-    <div 
+    <div
       className={`min-h-screen w-full flex flex-col items-center pt-16 pb-4 px-4`}
       style={bgStyle}
     >
       <div className="w-full max-w-[600px] flex flex-col items-center flex-1">
-        
         {/* Profile Header */}
-        <div 
+        <div
           className="flex flex-col items-center text-center z-10 w-full mb-10 drop-shadow-md"
-          style={{ color: linktree.text_color || '#ffffff' }}
+          style={{ color: linktree.text_color || "#ffffff" }}
         >
-          {linktree.logo_url !== 'hidden' && (
+          {linktree.logo_url !== "hidden" && (
             <div className="w-28 h-28 rounded-full overflow-hidden mb-5 border-2 border-white/20 shadow-xl bg-neutral-900 flex items-center justify-center shrink-0">
               {linktree.logo_url ? (
-                <img src={linktree.logo_url} alt={linktree.business_name} className="w-full h-full object-cover" />
+                <img
+                  src={linktree.logo_url}
+                  alt={linktree.business_name}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <span className="text-4xl font-bold">{linktree.business_name ? linktree.business_name.charAt(0) : ''}</span>
+                <span className="text-4xl font-bold">
+                  {linktree.business_name
+                    ? linktree.business_name.charAt(0)
+                    : ""}
+                </span>
               )}
             </div>
           )}
-          <h1 className="text-2xl font-bold tracking-tight">{linktree.business_name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {linktree.business_name}
+          </h1>
           {linktree.description && (
             <p className="text-base mt-2 max-w-sm leading-relaxed opacity-90 mx-auto">
               {linktree.description}
@@ -66,26 +89,32 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
             const getIcon = (name: string) => {
               if (!name) return LucideIcons.Link;
               let pascalName = name;
-              if (name.includes('-')) {
-                pascalName = name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+              if (name.includes("-")) {
+                pascalName = name
+                  .split("-")
+                  .map(
+                    (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
+                  )
+                  .join("");
               } else {
                 pascalName = name.charAt(0).toUpperCase() + name.slice(1);
               }
               // @ts-ignore
               return LucideIcons[pascalName] || LucideIcons.Link;
-            }
-            const Icon = getIcon(link.icon)
-            
+            };
+            const Icon = getIcon(link.icon);
+
             return (
               <a
                 key={link.id}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-center w-full p-4 backdrop-blur-md rounded-xl border border-white/10 transition-all cursor-pointer overflow-hidden shadow-lg hover:shadow-white/5 hover:-translate-y-1 active:translate-y-0"
-                style={{ 
-                  background: link.bg_color || 'rgba(255,255,255,0.1)',
-                  color: link.text_color || '#ffffff'
+                className="group relative flex items-center justify-center w-full p-4 backdrop-blur-md border border-white/10 transition-all cursor-pointer overflow-hidden shadow-lg hover:shadow-white/5 hover:-translate-y-1 active:translate-y-0"
+                style={{
+                  background: link.bg_color || "rgba(255,255,255,0.1)",
+                  color: link.text_color || "#ffffff",
+                  borderRadius: link.border_radius || "12px",
                 }}
               >
                 <div className="absolute right-4">
@@ -97,24 +126,23 @@ export default async function PublicLinktreePage({ params }: { params: { slug: s
                 {/* Visual hover effect line */}
                 <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/0 group-hover:bg-white/20 transition-all" />
               </a>
-            )
+            );
           })}
         </div>
 
         {/* Branding Footer */}
         <div className="mt-auto w-full pb-4 z-10 flex justify-center">
-          <a 
-            href="https://insights.origuystudio.com" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://insights.origuystudio.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-6 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-sm md:text-sm font-medium tracking-wide transition-all hover:bg-black/50 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center gap-2"
-            style={{ color: linktree.text_color || '#ffffff' }}
+            style={{ color: linktree.text_color || "#ffffff" }}
           >
             <span>עוצב ופותח על ידי סטודיו אורי גיא</span>
           </a>
         </div>
-
       </div>
     </div>
-  )
+  );
 }
