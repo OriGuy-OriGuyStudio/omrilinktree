@@ -224,9 +224,8 @@ export default function LinktreeEditor({
 
   const sanitizeSlug = (val: string) => {
     return val
-      .toLowerCase()
       .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
+      .replace(/[^a-zA-Z0-9-]/g, "")
       .replace(/-+/g, "-");
   };
 
@@ -269,14 +268,20 @@ export default function LinktreeEditor({
     const checkAvailability = async () => {
       setIsCheckingSlug(true);
       try {
+        // Use .ilike for case-insensitive check to avoid similar slugs with different case
         const { data: existing, error } = await supabase
           .from("linktrees")
           .select("id")
-          .eq("slug", data.slug)
+          .ilike("slug", data.slug)
           .maybeSingle();
 
         if (error) throw error;
-        setIsSlugAvailable(!existing);
+        // If it's the same ID as current, it's available
+        if (existing && existing.id === initialData?.id) {
+          setIsSlugAvailable(true);
+        } else {
+          setIsSlugAvailable(!existing);
+        }
       } catch (err) {
         console.error("Error checking slug availability:", err);
       } finally {
@@ -486,12 +491,29 @@ export default function LinktreeEditor({
           text_color: link.text_color,
         }));
 
-        const { error: insertError } = await supabase
+        const { data: insertedLinks, error: insertError } = await supabase
           .from("links")
-          .insert(linksToInsert);
+          .insert(linksToInsert)
+          .select();
 
         if (insertError) throw insertError;
+
+        // Update local state with the actual links from DB (containing real IDs)
+        if (insertedLinks) {
+          setData(prev => ({
+            ...prev,
+            links: insertedLinks.sort((a, b) => a.order - b.order)
+          }));
+        }
+      } else {
+        // If all links were deleted, update local state
+        setData(prev => ({
+          ...prev,
+          links: []
+        }));
       }
+
+      router.refresh();
 
       // Success Confetti!
       const duration = 2000;
