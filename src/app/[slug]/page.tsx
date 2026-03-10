@@ -96,67 +96,70 @@ export default async function PublicLinktreePage({
         </div>
 
         <div
-          className="w-full space-y-4 z-10"
+          className="w-full flex-1 flex flex-col transition-transform duration-200"
           style={{
             transform: `translateY(${linktree.links_y_offset || 0}px)`,
           }}
         >
-          {links?.map((link) => {
-            const getIcon = (name: string) => {
-              if (!name) return LucideIcons.Link;
-              let pascalName = name;
-              if (name.includes("-")) {
-                pascalName = name
-                  .split("-")
-                  .map(
-                    (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
-                  )
-                  .join("");
-              } else {
-                pascalName = name.charAt(0).toUpperCase() + name.slice(1);
-              }
-              // @ts-ignore
-              return LucideIcons[pascalName] || LucideIcons.Link;
-            };
-            const Icon = getIcon(link.icon);
+          <div className="w-full space-y-4 z-10">
+            {links?.map((link) => {
+              const getIcon = (name: string) => {
+                if (!name) return LucideIcons.Link;
+                let pascalName = name;
+                if (name.includes("-")) {
+                  pascalName = name
+                    .split("-")
+                    .map(
+                      (w) =>
+                        w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
+                    )
+                    .join("");
+                } else {
+                  pascalName = name.charAt(0).toUpperCase() + name.slice(1);
+                }
+                // @ts-ignore
+                return LucideIcons[pascalName] || LucideIcons.Link;
+              };
+              const Icon = getIcon(link.icon);
 
-            return (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex items-center justify-center w-full p-4 backdrop-blur-md border border-white/10 transition-all cursor-pointer overflow-hidden shadow-lg hover:shadow-white/5 hover:-translate-y-1 active:translate-y-0"
-                style={{
-                  background: link.bg_color || "rgba(255,255,255,0.1)",
-                  color: link.text_color || "#ffffff",
-                  borderRadius: linktree.border_radius || "12px",
-                }}
-              >
-                <div className="absolute right-4">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span className="font-semibold text-center px-12 truncate w-full text-lg">
-                  {link.title}
-                </span>
-                {/* Visual hover effect line */}
-                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/0 group-hover:bg-white/20 transition-all" />
-              </a>
-            );
-          })}
-        </div>
+              return (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex items-center justify-center w-full p-4 backdrop-blur-md border border-white/10 transition-all cursor-pointer overflow-hidden shadow-lg hover:shadow-white/5 hover:-translate-y-1 active:translate-y-0"
+                  style={{
+                    background: link.bg_color || "rgba(255,255,255,0.1)",
+                    color: link.text_color || "#ffffff",
+                    borderRadius: linktree.border_radius || "12px",
+                  }}
+                >
+                  <div className="absolute right-4">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="font-semibold text-center px-12 truncate w-full text-lg">
+                    {link.title}
+                  </span>
+                  {/* Visual hover effect line */}
+                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/0 group-hover:bg-white/20 transition-all" />
+                </a>
+              );
+            })}
+          </div>
 
-        {/* Branding Footer */}
-        <div className="mt-auto w-full pb-4 z-10 flex justify-center">
-          <a
-            href="https://insights.origuystudio.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-sm md:text-sm font-medium tracking-wide transition-all hover:bg-black/50 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center gap-2"
-            style={{ color: linktree.text_color || "#ffffff" }}
-          >
-            <span>עוצב ופותח על ידי סטודיו אורי גיא</span>
-          </a>
+          {/* Branding Footer */}
+          <div className="mt-auto w-full pb-4 z-10 flex justify-center">
+            <a
+              href="https://insights.origuystudio.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-sm md:text-sm font-medium tracking-wide transition-all hover:bg-black/50 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center gap-2"
+              style={{ color: linktree.text_color || "#ffffff" }}
+            >
+              <span>עוצב ופותח על ידי סטודיו אורי גיא</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
