@@ -58,7 +58,12 @@ export default async function PublicLinktreePage({
           style={{ color: linktree.text_color || "#ffffff" }}
         >
           {linktree.logo_url !== "hidden" && (
-            <div className="w-28 h-28 rounded-full overflow-hidden mb-5 border-2 border-white/20 shadow-xl bg-neutral-900 flex items-center justify-center shrink-0">
+            <div
+              className="w-28 h-28 rounded-full overflow-hidden mb-5 border-2 border-white/20 shadow-xl bg-neutral-900 flex items-center justify-center shrink-0"
+              style={{
+                transform: `translateY(${linktree.logo_y_offset || 0}px)`,
+              }}
+            >
               {linktree.logo_url ? (
                 <img
                   src={linktree.logo_url}
@@ -74,17 +79,28 @@ export default async function PublicLinktreePage({
               )}
             </div>
           )}
-          <h1 className="text-2xl font-bold tracking-tight">
-            {linktree.business_name}
-          </h1>
-          {linktree.description && (
-            <p className="text-base mt-2 max-w-sm leading-relaxed opacity-90 mx-auto">
-              {linktree.description}
-            </p>
-          )}
+          <div
+            style={{
+              transform: `translateY(${linktree.header_y_offset || 0}px)`,
+            }}
+          >
+            <h1 className="text-2xl font-bold tracking-tight">
+              {linktree.business_name}
+            </h1>
+            {linktree.description && (
+              <p className="text-base mt-2 max-w-sm leading-relaxed opacity-90 mx-auto">
+                {linktree.description}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="w-full space-y-4 z-10">
+        <div
+          className="w-full space-y-4 z-10"
+          style={{
+            transform: `translateY(${linktree.links_y_offset || 0}px)`,
+          }}
+        >
           {links?.map((link) => {
             const getIcon = (name: string) => {
               if (!name) return LucideIcons.Link;

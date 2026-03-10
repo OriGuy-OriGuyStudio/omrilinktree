@@ -44,7 +44,12 @@ export default function LivePreview({ data }: LivePreviewProps) {
           style={{ color: data.text_color || "#ffffff" }}
         >
           {data.logo_url !== "hidden" && (
-            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-white/20 shadow-xl bg-neutral-800 flex items-center justify-center shrink-0">
+            <div
+              className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-white/20 shadow-xl bg-neutral-800 flex items-center justify-center shrink-0 transition-transform duration-200"
+              style={{
+                transform: `translateY(${data.logo_y_offset || 0}px)`,
+              }}
+            >
               {data.logo_url ? (
                 <img
                   src={data.logo_url}
@@ -58,17 +63,29 @@ export default function LivePreview({ data }: LivePreviewProps) {
               )}
             </div>
           )}
-          <h2 className="text-xl font-bold tracking-tight">
-            {data.business_name || "שם העסק"}
-          </h2>
-          {data.description && (
-            <p className="text-sm mt-2 opacity-90 max-w-[250px] leading-relaxed">
-              {data.description}
-            </p>
-          )}
+          <div
+            className="transition-transform duration-200"
+            style={{
+              transform: `translateY(${data.header_y_offset || 0}px)`,
+            }}
+          >
+            <h2 className="text-xl font-bold tracking-tight">
+              {data.business_name || "שם העסק"}
+            </h2>
+            {data.description && (
+              <p className="text-sm mt-2 opacity-90 max-w-[250px] leading-relaxed">
+                {data.description}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="w-full space-y-4 z-10 flex-1">
+        <div
+          className="w-full space-y-4 z-10 flex-1 transition-transform duration-200"
+          style={{
+            transform: `translateY(${data.links_y_offset || 0}px)`,
+          }}
+        >
           {data.links.map((link) => {
             const getIcon = (name: string) => {
               if (!name) return LucideIcons.Link;

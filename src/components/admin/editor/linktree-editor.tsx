@@ -65,6 +65,9 @@ export interface LinktreeData {
   bg_value: string;
   text_color: string;
   border_radius: string;
+  logo_y_offset: number;
+  header_y_offset: number;
+  links_y_offset: number;
   links: Link[];
 }
 
@@ -227,6 +230,9 @@ export default function LinktreeEditor({
         : initialData?.bg_value || "#0e0e0e",
     text_color: initialData?.text_color || "#ffffff",
     border_radius: initialData?.border_radius || "12px",
+    logo_y_offset: initialData?.logo_y_offset || 0,
+    header_y_offset: initialData?.header_y_offset || 0,
+    links_y_offset: initialData?.links_y_offset || 0,
     links:
       initialData?.links?.map((l: any) => ({
         ...l,
@@ -388,6 +394,9 @@ export default function LinktreeEditor({
             : data.bg_value,
         text_color: data.text_color,
         border_radius: data.border_radius,
+        logo_y_offset: data.logo_y_offset,
+        header_y_offset: data.header_y_offset,
+        links_y_offset: data.links_y_offset,
       };
 
       if (isNew) {
@@ -796,6 +805,84 @@ export default function LinktreeEditor({
                         dir="ltr"
                       >
                         {data.border_radius || "12px"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pb-4 border-b border-neutral-800">
+                    <Label>מיקום לוגו (למעלה/למטה)</Label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={data.logo_y_offset}
+                        onChange={(e) =>
+                          handleChange(
+                            "logo_y_offset",
+                            parseInt(e.target.value),
+                          )
+                        }
+                        className="flex-1 h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-white"
+                      />
+                      <span
+                        className="text-sm font-mono text-neutral-400 w-12 text-left"
+                        dir="ltr"
+                      >
+                        {data.logo_y_offset}px
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pb-4 border-b border-neutral-800">
+                    <Label>מיקום כותרות (למעלה/למטה)</Label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={data.header_y_offset}
+                        onChange={(e) =>
+                          handleChange(
+                            "header_y_offset",
+                            parseInt(e.target.value),
+                          )
+                        }
+                        className="flex-1 h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-white"
+                      />
+                      <span
+                        className="text-sm font-mono text-neutral-400 w-12 text-left"
+                        dir="ltr"
+                      >
+                        {data.header_y_offset}px
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pb-4 border-b border-neutral-800">
+                    <Label>מיקום קישורים (למעלה/למטה)</Label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={data.links_y_offset}
+                        onChange={(e) =>
+                          handleChange(
+                            "links_y_offset",
+                            parseInt(e.target.value),
+                          )
+                        }
+                        className="flex-1 h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-white"
+                      />
+                      <span
+                        className="text-sm font-mono text-neutral-400 w-12 text-left"
+                        dir="ltr"
+                      >
+                        {data.links_y_offset}px
                       </span>
                     </div>
                   </div>
