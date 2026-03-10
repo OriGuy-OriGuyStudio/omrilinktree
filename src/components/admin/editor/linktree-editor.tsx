@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ import {
   Facebook,
   MessageCircle,
   Send,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import LivePreview from "./live-preview";
 import { uploadImage } from "@/utils/supabase/storage";
@@ -216,6 +219,16 @@ export default function LinktreeEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingBg, setIsUploadingBg] = useState(false);
+  const [isSlugAvailable, setIsSlugAvailable] = useState<boolean | null>(null);
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+
+  const sanitizeSlug = (val: string) => {
+    return val
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-");
+  };
 
   const [data, setData] = useState<LinktreeData>({
     slug: initialData?.slug || "",
@@ -240,6 +253,40 @@ export default function LinktreeEditor({
         text_color: l.text_color || "#ffffff",
       })) || [],
   });
+
+  // Slug availability check logic
+  useEffect(() => {
+    if (!data.slug) {
+      setIsSlugAvailable(null);
+      return;
+    }
+
+    if (data.slug === initialData?.slug) {
+      setIsSlugAvailable(true);
+      return;
+    }
+
+    const checkAvailability = async () => {
+      setIsCheckingSlug(true);
+      try {
+        const { data: existing, error } = await supabase
+          .from("linktrees")
+          .select("id")
+          .eq("slug", data.slug)
+          .maybeSingle();
+
+        if (error) throw error;
+        setIsSlugAvailable(!existing);
+      } catch (err) {
+        console.error("Error checking slug availability:", err);
+      } finally {
+        setIsCheckingSlug(false);
+      }
+    };
+
+    const timer = setTimeout(checkAvailability, 500);
+    return () => clearTimeout(timer);
+  }, [data.slug, initialData?.slug, supabase]);
 
   // DND setup
   const sensors = useSensors(
@@ -312,7 +359,11 @@ export default function LinktreeEditor({
   };
 
   const handleChange = (field: keyof LinktreeData, value: any) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+    let finalValue = value;
+    if (field === "slug") {
+      finalValue = sanitizeSlug(value);
+    }
+    setData((prev) => ({ ...prev, [field]: finalValue }));
   };
 
   const handleFileUpload = async (
@@ -489,9 +540,14 @@ export default function LinktreeEditor({
       }
     } catch (error: any) {
       console.error("Error saving linktree:", error);
+      let errorMessage = error?.message || "שגיאה לא ידועה";
+      
+      if (errorMessage.includes("linktrees_slug_key") || errorMessage.includes("duplicate key value violates unique constraint")) {
+        errorMessage = `הכתובת "${data.slug}" כבר תפוסה. בחר כתובת אחרת.`;
+      }
+
       alert(
-        "שגיאה בשמירה. וודא שהרצת את סקריפט ה-SQL לעדכון מסד הנתונים! פרטים: " +
-          (error?.message || "שגיאה לא ידועה"),
+        "שגיאה בשמירה. " + errorMessage
       );
     } finally {
       setIsSaving(false);
@@ -565,8 +621,24 @@ export default function LinktreeEditor({
                         value={data.slug}
                         onChange={(e) => handleChange("slug", e.target.value)}
                         className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
+                        placeholder="כתובת-העמוד-שלך"
                       />
+                      <div className="flex items-center px-3 border-l bg-muted/30">
+                        {isCheckingSlug ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        ) : isSlugAvailable === true ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        ) : isSlugAvailable === false ? (
+                          <XCircle className="w-4 h-4 text-destructive" />
+                        ) : null}
+                      </div>
                     </div>
+                    {isSlugAvailable === false && (
+                      <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" />
+                        הכתובת הזו כבר תפוסה, בחר כתובת אחרת.
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="business_name">שם העסק / מותג</Label>
